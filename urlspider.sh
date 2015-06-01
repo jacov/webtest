@@ -114,18 +114,20 @@ check_error
 #	grep -i -o '<a[^>]\+href[ ]*=[ \t]*"\(ht\|f\)tps\?:[^"]\+"' |  \
 #	sed -e 's/^.*"\([^"]\+\)".*$/\1/g' -e 's/.*href="//' -e 's/".*//' | \ 
 #	grep '^[a-zA-Z].*'
+# JOB1
+> ${WGETLOG} # reset wgetlog
 wget --spider --recursive --no-verbose --output-file=${WGETLOG} ${SITE2CRAWL} &
+export JOB1_PID=$!
+disown $JOB1_PID
 
+# JOB2
 # give the craweler some time...
 sleep $CRAWLTIME &
+export JOB2_PID=$!
 
-echo "
-loading spider...
+export JOBSTATUS="RUNNING"
 
-	$SpiderLogo                                                                                                
-"
-
-while sleep 5
+while test "$JOBSTATUS" == "RUNNING"
 do 
 	calcURLs
 	clear
@@ -144,11 +146,29 @@ do
 
 	spider is crawling site, please wait...
 	"
+	sleep 5
+	
+	# test if crawltime sleep command is complete
+	# jobs %2 # &>/dev/null 
+	ps -p $JOB2_PID &>/dev/null
+	if test $? -gt 0
+	then
+	 echo "Crawler Completed"
+	 export JOBSTATUS="DONE"
+	fi
 done
 
-wait %2 # wait for the crawl time
-kill %1 # kill the crawler
+#--# wait %2 # wait for the crawl time
+echo "
+
+=================
+
+Shutting down spider...
+
+"
+kill -9 $JOB1_PID # kill the crawler
 check_error
+echo "...done"
 
 # extract URLs from wget log
 cat ${WGETLOG} | grep -a "URL:" | awk '{print $3}' | sed -e 's/URL://g' | grep -v '^$' | sort -u > ${URLS}
@@ -160,7 +180,9 @@ echo "
 finding all external http calls and assets in source, 
 this will take time depending on the amount of URLs
 
-please wait..."
+please wait...
+
+"
 cat /dev/null > $URLS_ASSETS_TMP
 check_error
 cat ${URLS} | while read url
