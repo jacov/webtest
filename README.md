@@ -1,7 +1,7 @@
 # webtest
 
 An automated test of a Websites Caching strategy.
-These scripts will crawl your website, generate URLs for testing, then run Header tests to determine if your site's pages are utilizing Caching properly.
+These scripts will crawl your website, generate URLs for testing, then run Header tests to determine HTTP Status Codes per page, and if your site's pages are utilizing Caching properly.
 It will test Varnish & Akamai configuration.
 And it will generate a nice report for you to analyize.
 
