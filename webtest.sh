@@ -119,14 +119,24 @@ function testVarnishCache() {
 #
 # Test Varnish hit / miss
 #
-export VARNISH_CACHE_CODE=$(echo "$HEADERS" | grep "X-Varnish-Cache:" | awk '{print $2}' | tr -d $'\r' )  
+# ex: X-Varnish: 1215332184 1215325938
+#--# export VARNISH_CACHE_CODE=$(echo "$HEADERS" | grep "X-Varnish-Cache:" | awk '{print $2}' | tr -d $'\r' )  
+export VARNISH_CACHE_CODE_COUNT=$(echo "$HEADERS" | grep "X-Varnish:" | cut -f2,3 -d ' ' | tr -d $'\r' | tr ' ' '\n' | wc -l | sed -e 's/ //g')  
 
-if test -z "$VARNISH_CACHE_CODE"
+if test "$VARNISH_CACHE_CODE_COUNT" == "2"
 then
-	export VARNISH_CACHE_CODE="VARNISH_MISS_NULL"
-else
-	export VARNISH_CACHE_CODE=$(echo "$HEADERS" | grep "X-Varnish-Cache:" | awk '{print $2}' | tr -d $'\r' )
+	export VARNISH_CACHE_CODE="HIT"
+elif test "$VARNISH_CACHE_CODE_COUNT" == "1"
+then
+	export VARNISH_CACHE_CODE="MISS"
 fi
+
+#if test -z "$VARNISH_CACHE_CODE"
+#then
+#	export VARNISH_CACHE_CODE="VARNISH_MISS_NULL"
+#else
+#	export VARNISH_CACHE_CODE=$(echo "$HEADERS" | grep "X-Varnish-Cache:" | awk '{print $2}' | tr -d $'\r' )
+#fi
 
 }
 ################
