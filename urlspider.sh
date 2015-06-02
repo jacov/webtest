@@ -168,7 +168,6 @@ Shutting down spider...
 "
 if test -z "$JOB1_PID"
 then
-	check_error
 	echo "done"
 else
 	kill -9 $JOB1_PID # kill the crawler
