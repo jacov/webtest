@@ -79,7 +79,7 @@ Additional configuration by setting the following variables:
 * URLS - the path to the file where URLs will be saved
 * OUTDIR - the path where output will be generated
 * CUSTOMER - the name for the report
-
+* CUSTOM_COOKIE - cusom cookie headers to include in the requests
 
 
 
