@@ -166,12 +166,14 @@ echo "
 Shutting down spider...
 
 "
-if [[ -z $JOB1_PID ]]; then
-	kill -9 $JOB1_PID # kill the crawler
+wget_process=$(ps aux | grep $JOB1_PID | grep -v "grep")
+# If the wget process still exists (aka is not empty), then kill it.
+if [[ ! -z ${wget_process} ]]; then
+	kill -9 ${JOB1_PID}
 	check_error
-	echo "...done"
+	echo "... killed wget"
 else
-	echo "...done"
+	echo "... wget already finished"
 fi
 
 
