@@ -21,7 +21,7 @@ export URLS="$3"
 
 
 # to avoid sed errors on non standard chars
-export LC_CTYPE=C 
+export LC_CTYPE=C
 export LANG=C
 
 
@@ -38,7 +38,7 @@ then
 	./$(basename $0) http://www.si.com 3600 urls.txt
 
 	NOTE:
-	The more crawl time specified, the more URLs will be craweled and discovered. 
+	The more crawl time specified, the more URLs will be craweled and discovered.
 	Large sites may take a very long time to crawl.
 
 	"
@@ -78,14 +78,14 @@ export CURRENT_URL_COUNT="$(cat ${WGETLOG} | grep -a "URL:" | awk '{print $3}' |
 ################
 
 export SpiderLogo='
- ___  ___  ________  ___               ________  ________  ___  ________  _______   ________     
-|\  \|\  \|\   __  \|\  \             |\   ____\|\   __  \|\  \|\   ___ \|\  ___ \ |\   __  \    
-\ \  \\\  \ \  \|\  \ \  \            \ \  \___|\ \  \|\  \ \  \ \  \_|\ \ \   __/|\ \  \|\  \   
- \ \  \\\  \ \   _  _\ \  \            \ \_____  \ \   ____\ \  \ \  \ \\ \ \  \_|/_\ \   _  _\  
-  \ \  \\\  \ \  \\  \\ \  \____        \|____|\  \ \  \___|\ \  \ \  \_\\ \ \  \_|\ \ \  \\  \| 
-   \ \_______\ \__\\ _\\ \_______\        ____\_\  \ \__\    \ \__\ \_______\ \_______\ \__\\ _\ 
+ ___  ___  ________  ___               ________  ________  ___  ________  _______   ________
+|\  \|\  \|\   __  \|\  \             |\   ____\|\   __  \|\  \|\   ___ \|\  ___ \ |\   __  \
+\ \  \\\  \ \  \|\  \ \  \            \ \  \___|\ \  \|\  \ \  \ \  \_|\ \ \   __/|\ \  \|\  \
+ \ \  \\\  \ \   _  _\ \  \            \ \_____  \ \   ____\ \  \ \  \ \\ \ \  \_|/_\ \   _  _\
+  \ \  \\\  \ \  \\  \\ \  \____        \|____|\  \ \  \___|\ \  \ \  \_\\ \ \  \_|\ \ \  \\  \|
+   \ \_______\ \__\\ _\\ \_______\        ____\_\  \ \__\    \ \__\ \_______\ \_______\ \__\\ _\
     \|_______|\|__|\|__|\|_______|       |\_________\|__|     \|__|\|_______|\|_______|\|__|\|__|
-                                         \|_________|                                            
+                                         \|_________|
 '
 
 ################
@@ -109,10 +109,10 @@ check_error
 #    grep -i -o '<a[^>]\+href[ ]*=[ \t]*"\(ht\|f\)tps\?:[^"]\+"' | \
 #    sed -e 's/^.*"\([^"]\+\)".*$/\1/g' >> ${WGETLOG}
 
-#wget --spider --recursive -q ${URL} -O - 	|  \   
+#wget --spider --recursive -q ${URL} -O - 	|  \
 #	tr "\t\r\n'" '   "' 	|  \
 #	grep -i -o '<a[^>]\+href[ ]*=[ \t]*"\(ht\|f\)tps\?:[^"]\+"' |  \
-#	sed -e 's/^.*"\([^"]\+\)".*$/\1/g' -e 's/.*href="//' -e 's/".*//' | \ 
+#	sed -e 's/^.*"\([^"]\+\)".*$/\1/g' -e 's/.*href="//' -e 's/".*//' | \
 #	grep '^[a-zA-Z].*'
 # JOB1
 > ${WGETLOG} # reset wgetlog
@@ -128,7 +128,7 @@ export JOB2_PID=$!
 export JOBSTATUS="RUNNING"
 
 while test "$JOBSTATUS" == "RUNNING"
-do 
+do
 	calcURLs
 	clear
 	echo "
@@ -137,7 +137,7 @@ do
 	$SpiderLogo
 
 
-	Crawl Started: $CRAWLSTART 
+	Crawl Started: $CRAWLSTART
 	Estimated End Time: $CRAWLEND
 
 	Crawling for $CRAWLTIME seconds...
@@ -147,9 +147,9 @@ do
 	spider is crawling site, please wait...
 	"
 	sleep 5
-	
+
 	# test if crawltime sleep command is complete
-	# jobs %2 # &>/dev/null 
+	# jobs %2 # &>/dev/null
 	ps -p $JOB2_PID &>/dev/null
 	if test $? -gt 0
 	then
@@ -166,12 +166,11 @@ echo "
 Shutting down spider...
 
 "
-if test -z "$JOB1_PID"
-then
-	echo "done"
-else
+if [[ -z $JOB1_PID ]]; then
 	kill -9 $JOB1_PID # kill the crawler
 	check_error
+	echo "...done"
+else
 	echo "...done"
 fi
 
@@ -183,7 +182,7 @@ check_error
 # find all external http calls and assets in source, this will take time depending on the amount of URLs
 echo "
 ...
-finding all external http calls and assets in source, 
+finding all external http calls and assets in source,
 this will take time depending on the amount of URLs
 
 please wait...
