@@ -103,13 +103,13 @@ function testAkamaiCache() {
 # TCP_MEM_HIT: Object was on disk and in the memory cache. Server served it without hitting the disk.
 # TCP_DENIED: Denied access to the client for whatever reason
 # TCP_COOKIE_DENY: Denied access on cookie authentication (if centralized or decentralized authorization feature is being used in configuration)
-export AKAMAI_CACHE_CODE=$(echo "$HEADERS" | grep "X-Cache" | awk '{print $2}')  
+export AKAMAI_CACHE_CODE=$(echo "$HEADERS" | grep "X-Cache" | awk '{print $2}'| tr -d $'\r')  
 
 if test -z "$AKAMAI_CACHE_CODE"
 then
 	export AKAMAI_CACHE_CODE="AKAMAI_CACHE_CODE_NULL"
 else
-	export AKAMAI_CACHE_CODE=$(echo "$HEADERS" | grep "X-Cache" | awk '{print $2}')  
+	export AKAMAI_CACHE_CODE=$(echo "$HEADERS" | grep "X-Cache" | awk '{print $2}' | tr -d $'\r')  
 fi
 
 
@@ -119,6 +119,8 @@ function testVarnishCache() {
 #
 # Test Varnish hit / miss
 #
+# https://www.varnish-cache.org/docs/2.1/faq/http.html
+# "For a cache hit, X-Varnish will contain both the ID of the current request and the ID of the request that populated the cache. It makes debugging Varnish a lot easier."
 # ex: X-Varnish: 1215332184 1215325938
 #--# export VARNISH_CACHE_CODE=$(echo "$HEADERS" | grep "X-Varnish-Cache:" | awk '{print $2}' | tr -d $'\r' )  
 export VARNISH_CACHE_CODE_COUNT=$(echo "$HEADERS" | grep "X-Varnish:" | cut -f2,3 -d ' ' | tr -d $'\r' | tr ' ' '\n' | wc -l | sed -e 's/ //g')  
@@ -142,13 +144,13 @@ fi
 ################
 function testHTTPStatusCode() {
 	# EXAMPLE: HTTP status codes -> HTTP/1.1 200 OK
-	export HTTP_STATUS_CODE=$(echo "$HEADERS" | grep "HTTP/" | awk '{print $2}' | tr -d $'\r')  
+	export HTTP_STATUS_CODE=$(echo "$HEADERS" | grep "HTTP/" | cut -f 2 -d ' ' | tr -d $'\r')  
 
 if test -z "$HTTP_STATUS_CODE"
 then
 	export HTTP_STATUS_CODE="HTTP_STATUS_CODE_NULL"
 else
-	export HTTP_STATUS_CODE=$(echo "$HEADERS" | grep "HTTP/" | awk '{print $2}' | tr -d $'\r')  
+	export HTTP_STATUS_CODE=$(echo "$HEADERS" | grep "HTTP/" | cut -f 2 -d ' ' | tr -d $'\r')  
 fi
 
 }
@@ -285,7 +287,7 @@ do
 	#
 
 	# Write the results to file
-	 echo ""${HTTP_STATUS_CODE}","${AKAMAI_CACHE_CODE}","${VARNISH_CACHE_CODE}","${VARNISH_CACHE_HITS}","${MAX_AGE}","${X_AGE}","${REQUEST_TIME}","$url"" | tee -a $RESULTS_CSV
+	 echo ""${HTTP_STATUS_CODE}","${AKAMAI_CACHE_CODE}","${VARNISH_CACHE_CODE}","${VARNISH_CACHE_HITS}","${MAX_AGE}","${X_AGE}","${REQUEST_TIME}","$url"" | tr -d $'\r' | tee -a $RESULTS_CSV
 	check_error
 
 done
