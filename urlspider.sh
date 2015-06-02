@@ -204,6 +204,7 @@ check_error
 
 # combine all unique URLs into one file
 cat $URLS $URLS_ASSETS | sort -u > $URLS_ALL
+mv $URLS_ALL $URLS
 check_error
 
 echo "
@@ -218,7 +219,6 @@ The following files contain URLs:
 
 $(wc -l $URLS)
 $(wc -l $URLS_ASSETS)
-$(wc -l $URLS_ALL)
 
 ======================
 "
