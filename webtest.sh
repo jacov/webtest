@@ -81,9 +81,9 @@ export URL=$1
 # check if custom cookie is set in conf file
 if test -z "${CUSTOM_COOKIE}"
 then
-	curl --cookie "${CUSTOM_COOKIE}" -sIXGET -H "Pragma: akamai-x-cache-on" ${URL}
+	curl --insecure --cookie "${CUSTOM_COOKIE}" -sIXGET -H "Pragma: akamai-x-cache-on" ${URL}
 else
-	curl -sIXGET -H "Pragma: akamai-x-cache-on" ${URL}
+	curl --insecure -sIXGET -H "Pragma: akamai-x-cache-on" ${URL}
 fi
 
 }
