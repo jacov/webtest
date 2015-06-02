@@ -166,9 +166,16 @@ echo "
 Shutting down spider...
 
 "
-kill -9 $JOB1_PID # kill the crawler
-check_error
-echo "...done"
+if test -z "$JOB1_PID"
+then
+	check_error
+	echo "done"
+else
+	kill -9 $JOB1_PID # kill the crawler
+	check_error
+	echo "...done"
+fi
+
 
 # extract URLs from wget log
 cat ${WGETLOG} | grep -a "URL:" | awk '{print $3}' | sed -e 's/URL://g' | grep -v '^$' | sort -u > ${URLS}
