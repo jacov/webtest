@@ -39,7 +39,7 @@ then
 	./$(basename $0) http://www.si.com 3600 urls.txt
 
 	Example 1/2 hour crawl with optional "local" scope (no external url's):
-	./$(basename $0) http://www.si.com 3600 urls.txt local
+	./$(basename $0) http://www.si.com 1800 urls.txt local
 
 
 	NOTE:
