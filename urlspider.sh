@@ -9,6 +9,7 @@
 export SITE2CRAWL=$1
 export CRAWLTIME=$2
 export URLS="$3"
+export SCOPE="$4"
 
 # OVERRIDES set in conf
 #export OUTDIR='outdir'
@@ -36,6 +37,10 @@ then
 
 	Example 1 hour crawl:
 	./$(basename $0) http://www.si.com 3600 urls.txt
+
+	Example 1/2 hour crawl with optional "local" scope (no external url's):
+	./$(basename $0) http://www.si.com 3600 urls.txt local
+
 
 	NOTE:
 	The more crawl time specified, the more URLs will be craweled and discovered.
@@ -74,6 +79,35 @@ fi
 function calcURLs() {
 export CURRENT_URL_COUNT="$(cat ${WGETLOG} | grep -a "URL:" | awk '{print $3}' | sed -e 's/URL://g' | grep -v '^$' | sort -u | wc -l | sed -e 's/ //g')"
 #--# export URLS_REMAINING="$(echo "$CRAWLCOUNT-$CURRENT_URL_COUNT" |bc)"
+}
+################
+function findExternalURLs() {
+
+if test "$SCOPE" = "local"
+then
+	echo "scope=local..."
+else
+
+# find all external http calls and assets in source, this will take time depending on the amount of URLs
+echo "
+...
+finding all external http calls and assets in source,
+this will take time depending on the amount of URLs
+
+please wait...
+
+"
+cat /dev/null > $URLS_ASSETS_TMP
+check_error
+cat ${URLS} | while read url
+do
+	curl -s $url | grep href | sed -e 's/.*href="//' -e 's/".*//' | grep '^[a-zA-Z].*' | sort -u | grep "http" >> $URLS_ASSETS_TMP
+done
+
+# extract unique URLs from assets and external URLs
+cat $URLS_ASSETS_TMP | sort -u > $URLS_ASSETS
+check_error
+fi
 }
 ################
 
@@ -181,31 +215,17 @@ fi
 cat ${WGETLOG} | grep -a "URL:" | awk '{print $3}' | sed -e 's/URL://g' | grep -v '^$' | sort -u > ${URLS}
 check_error
 
-# find all external http calls and assets in source, this will take time depending on the amount of URLs
-echo "
-...
-finding all external http calls and assets in source,
-this will take time depending on the amount of URLs
-
-please wait...
-
-"
-cat /dev/null > $URLS_ASSETS_TMP
-check_error
-cat ${URLS} | while read url
-do
-	curl -s $url | grep href | sed -e 's/.*href="//' -e 's/".*//' | grep '^[a-zA-Z].*' | sort -u | grep "http" >> $URLS_ASSETS_TMP
-done
-
-# extract unique URLs from assets and external URLs
-cat $URLS_ASSETS_TMP | sort -u > $URLS_ASSETS
+findExternalURLs
 check_error
 
+if test "$SCOPE" != "local"
+then
+	# combine all unique URLs into one file
+	cat $URLS $URLS_ASSETS | sort -u > $URLS_ALL
+	mv $URLS_ALL $URLS
+	check_error
+fi
 
-# combine all unique URLs into one file
-cat $URLS $URLS_ASSETS | sort -u > $URLS_ALL
-mv $URLS_ALL $URLS
-check_error
 
 echo "
 
@@ -218,8 +238,14 @@ $(basename $0) completed successfully!
 The following files contain URLs:
 
 $(wc -l $URLS)
-$(wc -l $URLS_ASSETS)
+"
 
+if test "$SCOPE" != "local"
+then
+echo "$(wc -l $URLS_ASSETS)"
+fi
+
+echo "
 ======================
 "
 
