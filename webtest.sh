@@ -56,6 +56,19 @@ then
 fi
 }
 ################
+function checkURLSfile() {
+
+# test if file exists and has content
+if test -e $URLS && test -s $URLS
+then
+	echo "Testing: $URLS"
+else
+	echo "ERROR: URLS file does not exist or is empty: $URLS"
+	exit 1
+fi
+
+}
+################
 function getHeaders() {
 
 export URL=$1
@@ -194,10 +207,16 @@ fi
 #
 ############
 
+# check that URLS file exist before doing anything
+checkURLSfile
+check_error
+
+
 # reset outdir
 if test -d $OUTDIR
 then
-	rm -fr $OUTDIR
+	# TODO: Are you sure you want to overwrite OUTDIR?
+	# rm -fr $OUTDIR
 	mkdir -p $OUTDIR
 	check_error
 else
