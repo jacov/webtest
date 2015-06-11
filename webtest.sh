@@ -281,8 +281,15 @@ do
 	# Parse Headers, run tests, and get results
 	#
 	# Test Akamai
-	testAkamaiCache
-	check_error
+	if test "$TEST_AKAMAI" = "FALSE"
+	then
+		# Akamai test disabled in conf
+		echo "Akamai test disabled, skipping..."
+	else
+
+		testAkamaiCache
+		check_error
+	fi
 	#
 	# Test Varnish
 	testVarnishCache

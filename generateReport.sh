@@ -267,9 +267,18 @@ echo ;
 	 check_error
 echo ;
 	#--# DEBUG
-	echo "getAkamaiCacheCodeCount"
-	getAkamaiCacheCodeCount
-	 check_error
+
+	if test "$TEST_AKAMAI" = "FALSE"
+	then
+		# Akamai test disabled in conf
+		echo "Akamai test disabled, skipping..."
+	else
+		echo "getAkamaiCacheCodeCount"
+		getAkamaiCacheCodeCount
+	 	check_error
+	fi
+
+
 echo ;
 	#--# DEBUG
 	echo "getVarnishCacheCodeCount"
